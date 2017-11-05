@@ -37,6 +37,15 @@ var (
 	commit string
 )
 
+func actionHandler(e error) error {
+	if e != nil {
+		fmt.Println(e)
+		os.Exit(1)
+	}
+
+	return nil
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -206,7 +215,7 @@ func main() {
 				"against a list of previously leaked passwords.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Audit(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Audit(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.IntFlag{
@@ -225,7 +234,7 @@ func main() {
 						"To use this feature you need to download the dumps from https://haveibeenpwned.com/passwords first. This is a very expensive operation for advanced users",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.HIBP(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.HIBP(withGlobalFlags(ctx, c), c))
 					},
 					Flags: []cli.Flag{
 						cli.BoolFlag{
@@ -253,7 +262,7 @@ func main() {
 						"to a secret.",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.BinaryCat(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.BinaryCat(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.Complete,
 				},
@@ -267,7 +276,7 @@ func main() {
 					Aliases: []string{"sha", "sha256"},
 					Before:  func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.BinarySum(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.BinarySum(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.Complete,
 				},
@@ -283,7 +292,7 @@ func main() {
 					Before:  func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Aliases: []string{"cp"},
 					Action: func(c *cli.Context) error {
-						return action.BinaryCopy(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.BinaryCopy(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.Complete,
 					Flags: []cli.Flag{
@@ -307,7 +316,7 @@ func main() {
 					Before:  func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Aliases: []string{"mv"},
 					Action: func(c *cli.Context) error {
-						return action.BinaryMove(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.BinaryMove(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.Complete,
 					Flags: []cli.Flag{
@@ -331,7 +340,7 @@ func main() {
 				"Accepts as second argument (mount location) to clone and mount a sub store, e.g. " +
 				"gopass clone git@example.com/store.git foo/bar",
 			Action: func(c *cli.Context) error {
-				return action.Clone(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Clone(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -361,7 +370,7 @@ func main() {
 			Description: "" +
 				"This command allows for easy editing of the configuration",
 			Action: func(c *cli.Context) error {
-				return action.Config(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Config(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.ConfigComplete,
 			Flags: []cli.Flag{
@@ -380,7 +389,7 @@ func main() {
 				"It will also handle copying secrets to different sub stores.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Copy(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Copy(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -398,7 +407,7 @@ func main() {
 				"This command starts a wizard to aid in creation of new secrets.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Create(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Create(withGlobalFlags(ctx, c), c))
 			},
 		},
 		{
@@ -410,7 +419,7 @@ func main() {
 			Aliases: []string{"remove", "rm"},
 			Before:  func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Delete(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Delete(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -435,7 +444,7 @@ func main() {
 				"editing.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Edit(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Edit(withGlobalFlags(ctx, c), c))
 			},
 			Aliases:      []string{"set"},
 			BashComplete: action.Complete,
@@ -450,7 +459,7 @@ func main() {
 				"multiple matches a selection will be shown.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Find(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Find(withGlobalFlags(ctx, c), c))
 			},
 			Aliases:      []string{"search"},
 			BashComplete: action.Complete,
@@ -469,7 +478,7 @@ func main() {
 				"wrong file persmissions or missing / extra recipients.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Fsck(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Fsck(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -493,7 +502,7 @@ func main() {
 				"It will replace only the first line of an existing file with a new password.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Generate(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Generate(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -545,7 +554,7 @@ func main() {
 					Usage:       "Listen and respond to messages via stdin/stdout",
 					Description: "Gopass is started in listen mode from browser plugins using a wrapper specified in native messaging host manifests",
 					Action: func(c *cli.Context) error {
-						return action.JSONAPI(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.JSONAPI(withGlobalFlags(ctx, c), c))
 					},
 				},
 				{
@@ -553,7 +562,7 @@ func main() {
 					Usage:       "Setup gopass native messaging manifest for selected browser",
 					Description: "To access gopass from browser plugins, a native app manifest must be installed at the correct location",
 					Action: func(c *cli.Context) error {
-						return action.SetupNativeMessaging(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.SetupNativeMessaging(withGlobalFlags(ctx, c), c))
 					},
 					Flags: []cli.Flag{
 						cli.StringFlag{
@@ -589,7 +598,7 @@ func main() {
 				"URL can be TOTP or HOTP.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.OTP(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.OTP(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -611,7 +620,7 @@ func main() {
 				"specified by git-command-args.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Git(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Git(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -634,7 +643,7 @@ func main() {
 					Description: "Create and initialize a new git repo in the store",
 					Before:      func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.GitInit(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.GitInit(withGlobalFlags(ctx, c), c))
 					},
 					Flags: []cli.Flag{
 						cli.StringFlag{
@@ -657,7 +666,7 @@ func main() {
 				"content.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Grep(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Grep(withGlobalFlags(ctx, c), c))
 			},
 		},
 		{
@@ -666,7 +675,7 @@ func main() {
 			Description: "" +
 				"Initialize new password storage and use gpg-id for encryption.",
 			Action: func(c *cli.Context) error {
-				return action.Init(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Init(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -692,7 +701,7 @@ func main() {
 				"Prompt before overwriting existing secret unless forced.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Insert(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Insert(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -719,7 +728,7 @@ func main() {
 			Aliases: []string{"ls"},
 			Before:  func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.List(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.List(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -746,7 +755,7 @@ func main() {
 				"across different sub stores.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Move(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Move(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -764,7 +773,7 @@ func main() {
 				"subcommands to create or remove mounts.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.MountsPrint(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.MountsPrint(withGlobalFlags(ctx, c), c))
 			},
 			Subcommands: []cli.Command{
 				{
@@ -776,7 +785,7 @@ func main() {
 						"at any path in an existing root store.",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.MountAdd(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.MountAdd(withGlobalFlags(ctx, c), c))
 					},
 					Flags: []cli.Flag{
 						cli.StringFlag{
@@ -794,7 +803,7 @@ func main() {
 						"only updated the configuration and not delete the password store.",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.MountRemove(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.MountRemove(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.MountsComplete,
 				},
@@ -808,7 +817,7 @@ func main() {
 				"The subcommands allow adding or removing recipients.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.RecipientsPrint(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.RecipientsPrint(withGlobalFlags(ctx, c), c))
 			},
 			Subcommands: []cli.Command{
 				{
@@ -823,7 +832,7 @@ func main() {
 						"secret.",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.RecipientsAdd(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.RecipientsAdd(withGlobalFlags(ctx, c), c))
 					},
 					Flags: []cli.Flag{
 						cli.StringFlag{
@@ -847,7 +856,7 @@ func main() {
 						"rotate all existing secrets.",
 					Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.RecipientsRemove(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.RecipientsRemove(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: func(c *cli.Context) {
 						action.RecipientsComplete(ctx, c)
@@ -870,7 +879,7 @@ func main() {
 				"simple one-command setup instructions.",
 			Hidden: true,
 			Action: func(c *cli.Context) error {
-				return action.InitOnboarding(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.InitOnboarding(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -903,7 +912,7 @@ func main() {
 				"If put on the clipboard, it will be cleared after 45 seconds.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Show(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Show(withGlobalFlags(ctx, c), c))
 			},
 			BashComplete: action.Complete,
 			Flags: []cli.Flag{
@@ -929,7 +938,7 @@ func main() {
 				"any possibly affected gpg keys.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.Sync(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Sync(withGlobalFlags(ctx, c), c))
 
 			},
 		},
@@ -941,7 +950,7 @@ func main() {
 				"and creating them.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return action.TemplatesPrint(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.TemplatesPrint(withGlobalFlags(ctx, c), c))
 			},
 			Subcommands: []cli.Command{
 				{
@@ -951,7 +960,7 @@ func main() {
 					Aliases:     []string{"cat"},
 					Before:      func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.TemplatePrint(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.TemplatePrint(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.TemplatesComplete,
 				},
@@ -962,7 +971,7 @@ func main() {
 					Aliases:     []string{"create", "new"},
 					Before:      func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.TemplateEdit(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.TemplateEdit(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.TemplatesComplete,
 				},
@@ -973,7 +982,7 @@ func main() {
 					Description: "Remove an existing template",
 					Before:      func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 					Action: func(c *cli.Context) error {
-						return action.TemplateRemove(withGlobalFlags(ctx, c), c)
+						return actionHandler(action.TemplateRemove(withGlobalFlags(ctx, c), c))
 					},
 					BashComplete: action.TemplatesComplete,
 				},
@@ -984,7 +993,7 @@ func main() {
 			Usage:       "Internal command to clear clipboard",
 			Description: "Clear the clipboard if the content matches the checksum.",
 			Action: func(c *cli.Context) error {
-				return action.Unclip(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Unclip(withGlobalFlags(ctx, c), c))
 			},
 			Hidden: true,
 			Flags: []cli.Flag{
@@ -1005,7 +1014,7 @@ func main() {
 				"This command checks for gopass updates at GitHub and automatically " +
 				"downloads and installs any missing update.",
 			Action: func(c *cli.Context) error {
-				return action.Update(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Update(withGlobalFlags(ctx, c), c))
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -1022,7 +1031,7 @@ func main() {
 				"along with version information of important external commands. " +
 				"Please provide the output when reporting issues.",
 			Action: func(c *cli.Context) error {
-				return action.Version(withGlobalFlags(ctx, c), c)
+				return actionHandler(action.Version(withGlobalFlags(ctx, c), c))
 			},
 		},
 	}
