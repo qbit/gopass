@@ -198,7 +198,7 @@ func main() {
 		if c.Args().Present() {
 			return action.Show(withGlobalFlags(ctx, c), c)
 		}
-		return action.List(withGlobalFlags(ctx, c), c)
+		return actionHandler(action.List(withGlobalFlags(ctx, c), c))
 	}
 
 	app.Flags = []cli.Flag{
