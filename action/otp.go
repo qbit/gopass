@@ -50,7 +50,12 @@ func (s *Action) OTP(ctx context.Context, c *cli.Context) error {
 			secKey = sec.Password()
 		}
 
-		otp, err = twofactor.NewGoogleTOTP(secKey)
+		if strings.HasPrefix(secKey, "otpauth://") {
+			otp, label, err = twofactor.FromURL(secKey)
+		} else {
+			otp, err = twofactor.NewGoogleTOTP(secKey)
+		}
+
 		if err != nil {
 			return s.exitError(ctx, ExitUnknown, err, "No OTP entry found for %s", name)
 		}
@@ -83,6 +88,7 @@ func (s *Action) OTP(ctx context.Context, c *cli.Context) error {
 
 	if c.String("qr") != "" {
 		var qr []byte
+		var err error
 		switch otp.Type() {
 		case twofactor.OATH_HOTP:
 			hotp := otp.(*twofactor.HOTP)
@@ -92,11 +98,12 @@ func (s *Action) OTP(ctx context.Context, c *cli.Context) error {
 			qr, err = totp.QR(label)
 		default:
 			err = errors.New("QR codes can only be generated for OATH OTPs")
+		}
+		if err != nil {
 			return s.exitError(ctx, ExitIO, err, "%s", err)
 		}
 
-		err := ioutil.WriteFile(c.String("qr"), qr, 0600)
-		if err != nil {
+		if err := ioutil.WriteFile(c.String("qr"), qr, 0600); err != nil {
 			return s.exitError(ctx, ExitIO, err, "failed to write QR code: %s", err)
 		}
 	}

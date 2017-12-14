@@ -22,16 +22,19 @@ func mkStoreWalkerFunc(alias, folder string, fn func(...string)) func(string, os
 		if info.IsDir() {
 			return nil
 		}
-		if strings.HasPrefix(info.Name(), ".") {
+		if path == folder {
 			return nil
 		}
-		if path == folder {
+		if strings.HasPrefix(info.Name(), ".") {
 			return nil
 		}
 		if path == filepath.Join(folder, GPGID) {
 			return nil
 		}
 		if info.Mode()&os.ModeSymlink != 0 {
+			return nil
+		}
+		if !strings.HasSuffix(path, ".gpg") {
 			return nil
 		}
 		s := strings.TrimPrefix(path, folder+sep)
@@ -53,6 +56,10 @@ func (s *Store) List(prefix string) ([]string, error) {
 		lst = append(lst, in...)
 	}
 
-	err := filepath.Walk(s.path, mkStoreWalkerFunc(prefix, s.path, addFunc))
+	path, err := filepath.EvalSymlinks(s.path)
+	if err != nil {
+		return lst, err
+	}
+	err = filepath.Walk(path, mkStoreWalkerFunc(prefix, path, addFunc))
 	return lst, err
 }

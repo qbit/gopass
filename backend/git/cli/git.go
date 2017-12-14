@@ -43,7 +43,7 @@ func (g *Git) Cmd(ctx context.Context, name string, args ...string) error {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	out.Debug(ctx, "store.%s: %s %+v", name, cmd.Path, cmd.Args)
+	out.Debug(ctx, "store.%s: %s %+v (%s)", name, cmd.Path, cmd.Args, g.path)
 
 	if err := cmd.Run(); err != nil {
 		out.Debug(ctx, "Output of '%s %+v': '%s'", cmd.Path, cmd.Args, buf.String())
@@ -75,6 +75,7 @@ func (g *Git) Init(ctx context.Context, signKey, userName, userEmail string) err
 
 	// commit if there is something to commit
 	if !g.HasStagedChanges(ctx) {
+		out.Debug(ctx, "No staged changes")
 		return nil
 	}
 
@@ -92,7 +93,7 @@ func (g *Git) Version(ctx context.Context) semver.Version {
 	cmd := exec.CommandContext(ctx, "git", "version")
 	cmdout, err := cmd.Output()
 	if err != nil {
-		out.Debug(ctx, "[DEBUG] Failed to run 'git version': %s", err)
+		out.Debug(ctx, "Failed to run 'git version': %s", err)
 		return v
 	}
 

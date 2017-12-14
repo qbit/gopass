@@ -13,19 +13,22 @@
 
 gopass needs some external programs to work:
 
-* `gpg`
-* `git`
+* `gpg` - [GnuPG](https://www.gnupg.org/), preferably in Version 2 or later
+* `git` - [Git SCM](https://git-scm.com/), any Version should be OK
+
+It is recommended to have either `rng-tools` or `haveged` installed to speed up
+key generation if these are available for your platform.
 
 #### Ubuntu & Debian
 
 ```bash
-apt-get install gnupg git
+apt-get install gnupg git rng-tools
 ```
 
 #### RHEL & CentOS
 
 ```bash
-yum install gnupg2 git
+yum install gnupg2 git rng-tools
 ```
 
 #### macOS
@@ -49,6 +52,9 @@ pkg_add gopass
 ```
 
 For OpenBSD 6.2 and earlier, install via `go get`.
+
+Please note that the OpenBSD builds uses `pledge(2)` to disable some syscalls,
+so some features (e.g. version checks, auto-update) are unavailable.
 
 ### Set up a GPG key pair
 
@@ -88,7 +94,6 @@ Depending on your operating system, you can either use a package manager, downlo
 If you haven't already, install [homebrew](http://brew.sh). And then:
 
 ```bash
-brew tap justwatchcom/gopass
 brew install gopass
 ```
 
@@ -121,6 +126,15 @@ First, find the latest .deb release from the repository [releases page](https://
 ```bash
 wget [the URL of the latest .deb release]
 sudo dpkg -i gopass-1.2.0-linux-amd64.deb
+```
+
+### Gentoo
+
+There is an overlay that includes gopass. Run these commands to install gopass through `emerge`.
+
+```bash
+layman -a go-overlay
+emerge -av gopass
 ```
 
 ### Windows
@@ -217,6 +231,8 @@ gopass jsonapi configure --print-only
 gopass jsonapi configure --browser chrome --path /home/user/.local/
 
 ```
+
+The username/login is determined from `login`, `username` and `user` yaml attributes. As fallback, the last part of the path is used, e.g. `theuser1` for `Internet/github.com/theuser1` entry.
  
 ### Storing and Syncing your Password Store with Google Drive / Dropbox / etc.
 

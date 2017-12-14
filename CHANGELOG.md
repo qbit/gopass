@@ -1,3 +1,40 @@
+## 1.6.4 / 2017-12-13
+
+* [ENHANCEMENT] Support desktop notifications on Mac and Windows [#513]
+* [BUGFIX] Fix slice out of bounds error [#517]
+* [BUGFIX] Allow .password-store to be a symlink [#516]
+* [BUGFIX] Respect --store flag to git subcommand [#512]
+
+## 1.6.3 / 2017-12-12
+
+* [ENHANCEMENT] Avoid altering YAML secrets unless necessary [#508]
+* [ENHANCEMENT] Documentation updates [#493] [#509]
+* [ENHANCEMENT] Abort if no gpg binary was found [#506]
+* [ENHANCEMENT] Support GOPASS_GPG_OPTS and GOPASS_UMASK [#504]
+* [BUGFIX] Create .gpg-keys if it does not exist [#507]
+
+## 1.6.2 / 2017-12-02
+
+* [FEATURE] Add gopass fix command [#471]
+* [ENHANCEMENT] Add pledge support on OpenBSD [#469]
+* [ENHANCEMENT] Improve no clipboard warning [#484]
+* [BUGFIX] Allow OTP entry in password field [#467]
+* [BUGFIX] Default to vi if no other editor is available [#479]
+* [BUGFIX] Avoid auto-search running non-interactively [#483]
+
+## 1.6.1 / 2017-11-15
+
+* [FEATURE] Add generic OTP action [#440]
+* [ENHANCEMENT] Ignore any secret that does not end with .gpg [#461]
+* [ENHANCEMENT] Add option to display only the password [#455]
+* [ENHANCEMENT] Disable fuzzy search for gopass find [#454]
+* [BUGFIX] Fix .gpg-id selection for subfolders [#465]
+* [BUGFIX] Set gpg.program if possible [#464]
+* [BUGFIX] Allow access to secrets shadowed by a folder [#463]
+* [BUGFIX] Set GPG_TTY [#452]
+* [BUGFIX] Fix termbox UI on OpenBSD [#446]
+* [BUGFIX] Fix tests and paths on Windows [#421] [#431] [#442] [#450]
+
 ## 1.6.0 / 2017-11-03
 
 * [FEATURE] Add Desktop notifications (Linux/DBus only) [#434] [#435]

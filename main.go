@@ -14,12 +14,13 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/fatih/color"
-	"github.com/justwatchcom/gopass/action"
+	ap "github.com/justwatchcom/gopass/action"
 	"github.com/justwatchcom/gopass/backend/gpg"
 	"github.com/justwatchcom/gopass/config"
 	"github.com/justwatchcom/gopass/store/sub"
 	"github.com/justwatchcom/gopass/utils/ctxutil"
 	"github.com/justwatchcom/gopass/utils/out"
+	"github.com/justwatchcom/gopass/utils/protect"
 	colorable "github.com/mattn/go-colorable"
 	"github.com/urfave/cli"
 )
@@ -47,6 +48,7 @@ func actionHandler(e error) error {
 }
 
 func main() {
+	protect.Pledge("stdio rpath wpath cpath tty proc exec")
 	ctx := context.Background()
 
 	// trap Ctrl+C and call cancel on the context
@@ -143,7 +145,7 @@ func main() {
 		sv = semver.Version{
 			Major: 1,
 			Minor: 6,
-			Patch: 0,
+			Patch: 4,
 			Pre: []semver.PRVersion{
 				semver.PRVersion{VersionStr: "git"},
 			},
@@ -162,7 +164,11 @@ func main() {
 
 	cli.VersionPrinter = makeVersionPrinter(sv)
 
-	action := action.New(ctx, cfg, sv)
+	action, err := ap.New(ctx, cfg, sv)
+	if err != nil {
+		out.Red(ctx, "No gpg binary found: %s", err)
+		os.Exit(ap.ExitGPG)
+	}
 
 	// set some action callbacks
 	if !cfg.Root.AutoImport {
@@ -459,7 +465,7 @@ func main() {
 				"multiple matches a selection will be shown.",
 			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
 			Action: func(c *cli.Context) error {
-				return actionHandler(action.Find(withGlobalFlags(ctx, c), c))
+				return actionHandler(action.Find(withGlobalFlags(ctxutil.WithFuzzySearch(ctx, false), c), c))
 			},
 			Aliases:      []string{"search"},
 			BashComplete: action.Complete,
@@ -467,6 +473,24 @@ func main() {
 				cli.BoolFlag{
 					Name:  "clip, c",
 					Usage: "Copy the password into the clipboard",
+				},
+			},
+		},
+		{
+			Name:   "fix",
+			Usage:  "Upgrade secrets",
+			Before: func(c *cli.Context) error { return action.Initialized(withGlobalFlags(ctx, c), c) },
+			Action: func(c *cli.Context) error {
+				return action.Fix(withGlobalFlags(ctx, c), c)
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "check, c",
+					Usage: "Only report",
+				},
+				cli.BoolFlag{
+					Name:  "force, f",
+					Usage: "Auto-correct any errors, do not ask",
 				},
 			},
 		},
@@ -927,6 +951,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "force, f",
 					Usage: "Display the password even if safecontent is enabled",
+				},
+				cli.BoolFlag{
+					Name:  "password, o",
+					Usage: "Dispaly only the password",
 				},
 			},
 		},

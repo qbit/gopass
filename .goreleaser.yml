@@ -88,7 +88,9 @@ fpm:
     - pacman
   dependencies:
     - git
-    - gnupg
+    - gnupg2
+  recommends:
+    - rng-tools
 source:
   name_template: "{{.Binary}}-{{.Version}}"
   excludes:

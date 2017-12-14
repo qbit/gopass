@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dominikschulz/github-releases/ghrel"
 	"github.com/fatih/color"
 	"github.com/justwatchcom/gopass/utils/out"
+	"github.com/justwatchcom/gopass/utils/protect"
 	"github.com/urfave/cli"
 )
 
@@ -26,8 +28,9 @@ func (s *Action) Version(ctx context.Context, c *cli.Context) error {
 			return
 		}
 
-		if s.version.String() == "0.0.0+HEAD" {
-			// chan not check version against HEAD
+		if strings.HasSuffix(s.version.String(), "+HEAD") || protect.ProtectEnabled {
+			// chan not check version against HEAD or
+			// against pledge(2)'d OpenBSD
 			u <- ""
 			return
 		}
@@ -48,9 +51,9 @@ func (s *Action) Version(ctx context.Context, c *cli.Context) error {
 			notice := fmt.Sprintf("\nYour version (%s) of gopass is out of date!\nThe latest version is %s.\n", s.version, r.Version().String())
 			notice += "You can update by downloading from www.justwatch.com/gopass"
 			if err := s.isUpdateable(ctx); err == nil {
-				notice += " by running 'gopass update' "
+				notice += " by running 'gopass update'"
 			}
-			notice += "or via your package manager"
+			notice += " or via your package manager"
 			u <- color.YellowString(notice)
 		}
 		u <- ""

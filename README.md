@@ -7,6 +7,7 @@
 [![Build Status](https://travis-ci.org/justwatchcom/gopass.svg?branch=master)](https://travis-ci.org/justwatchcom/gopass)
 [![Go Report Card](https://goreportcard.com/badge/github.com/justwatchcom/gopass)](https://goreportcard.com/report/github.com/justwatchcom/gopass)
 [![Code Climate](https://codeclimate.com/github/justwatchcom/gopass/badges/gpa.svg)](https://codeclimate.com/github/justwatchcom/gopass)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/justwatchcom/gopass/blob/master/LICENSE)
 
 The slightly more awesome Standard Unix Password Manager for Teams. Written in Go.
 
@@ -29,8 +30,6 @@ The slightly more awesome Standard Unix Password Manager for Teams. Written in G
 
 *gopass* is a rewrite of the *pass* password manager in [Go](https://golang.org/) with the aim of making it cross-platform and [adding additional features](#features). Our target audience are professional developers and sysadmins (and especially teams of those) who are well versed with a command line interface. One explicit goal for this project is to make it more approachable to non-technical users. We go by the UNIX philosophy and try to do one thing and do it well, providing a stellar user experience and a sane, simple interface.
 
-Warning: gopass currently works on Ubuntu & macOS. Please feel free to help with others.
-
 ## Demo
 
 [![asciicast](https://asciinema.org/a/101688.png)](https://asciinema.org/a/101688)
@@ -50,6 +49,9 @@ Please see [docs/features.md](https://github.com/justwatchcom/gopass/blob/master
 | password leak checker       | ❌     | ✔       | *alpha*   | Perform **offline** checks against known leaked passwords         |
 | PAGER support               | ❌     | ✔       | *stable*  | Automatically invoke a pager on long output                       |
 | JSON API                    | ❌     | ✔       | *alpha*   | Allow gopass to be used as a native extension for browser plugins |
+| Automatic fuzzy search      | ❌     | ✔       | *stable*   | Automatically search for matching store entries if a literal entry was not found |
+| gopass sync                 | ❌     | ✔       | *beta*    | Easy to use syncing of remote repos and GPG keys |
+| Desktop Notifications       | ❌     | ✔       | *beta*    | [Linux only] Display desktop notifications and completing long running operations |
 
 ## Installation
 

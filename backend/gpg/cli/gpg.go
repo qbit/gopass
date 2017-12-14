@@ -11,7 +11,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/blang/semver"
 	"github.com/justwatchcom/gopass/backend/gpg"
 	"github.com/justwatchcom/gopass/utils/out"
 	"github.com/pkg/errors"
@@ -42,25 +41,31 @@ type GPG struct {
 type Config struct {
 	Binary string
 	Args   []string
+	Umask  int
 }
 
 // New creates a new GPG wrapper
-func New(cfg Config) *GPG {
+func New(cfg Config) (*GPG, error) {
 	// ensure created files don't have group or world perms set
 	// this setting should be inherited by sub-processes
-	umask(077)
+	umask(cfg.Umask)
 
-	if len(cfg.Args) < 1 {
-		cfg.Args = defaultArgs
+	// make sure GPG_TTY is set (if possible)
+	if gt := os.Getenv("GPG_TTY"); gt == "" {
+		if t := tty(); t != "" {
+			_ = os.Setenv("GPG_TTY", t)
+		}
 	}
 
 	g := &GPG{
 		binary: "gpg",
-		args:   cfg.Args,
+		args:   append(defaultArgs, cfg.Args...),
 	}
-	_ = g.detectBinary(cfg.Binary)
+	if err := g.detectBinary(cfg.Binary); err != nil {
+		return nil, err
+	}
 
-	return g
+	return g, nil
 }
 
 // Binary returns the GPG binary location
@@ -229,31 +234,6 @@ func (g *GPG) ImportPublicKey(ctx context.Context, filename string) error {
 	g.privKeys = nil
 	g.pubKeys = nil
 	return nil
-}
-
-// Version will returns GPG version information
-func (g *GPG) Version(ctx context.Context) semver.Version {
-	v := semver.Version{}
-
-	cmd := exec.CommandContext(ctx, g.binary, "--version")
-	out, err := cmd.Output()
-	if err != nil {
-		return v
-	}
-
-	scanner := bufio.NewScanner(bytes.NewReader(out))
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if strings.HasPrefix(line, "gpg ") {
-			p := strings.Fields(line)
-			sv, err := semver.Parse(p[len(p)-1])
-			if err != nil {
-				continue
-			}
-			return sv
-		}
-	}
-	return v
 }
 
 // CreatePrivateKeyBatch will create a new GPG keypair in batch mode
